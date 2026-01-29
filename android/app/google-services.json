@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "1014821835671",
+    "project_id": "fieldpulse-c7701",
+    "storage_bucket": "fieldpulse-c7701.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:1014821835671:android:1fc2f2d5dfea14d5ffaad2",
+        "android_client_info": {
+          "package_name": "com.fieldpulse.app"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyBAr3SgcAkT1nrQwCWDFq7jnarbjemZ6f0"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

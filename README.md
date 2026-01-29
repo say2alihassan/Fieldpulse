@@ -1,97 +1,342 @@
-This is a new [**React Native**](https://reactnative.dev) project, bootstrapped using [`@react-native-community/cli`](https://github.com/react-native-community/cli).
+# FieldPulse
 
-# Getting Started
+A field service management mobile application built with React Native. Enables technicians to view assigned jobs, complete checklists, capture photos/signatures, and sync data offline.
 
-> **Note**: Make sure you have completed the [Set Up Your Environment](https://reactnative.dev/docs/set-up-your-environment) guide before proceeding.
+## Features
 
-## Step 1: Start Metro
+- **Job Management:** View, filter, and search assigned jobs with 60fps scrolling (500+ items)
+- **Dynamic Checklists:** 10 field types including photos, signatures, dates
+- **Offline-First:** Full functionality without network connectivity
+- **Photo Capture:** GPS-tagged photos with burned-in timestamps
+- **Signature Capture:** 60fps signature pad with landscape mode
+- **Push Notifications:** Real-time job assignments and updates via FCM
+- **Biometric Auth:** Face ID / Fingerprint unlock
+- **Form Validation:** Formik + Yup schema-based validation
 
-First, you will need to run **Metro**, the JavaScript build tool for React Native.
+## Tech Stack
 
-To start the Metro dev server, run the following command from the root of your React Native project:
+- **React Native** 0.83.1 (bare workflow)
+- **TypeScript** (strict mode)
+- **Zustand** - State management
+- **Formik + Yup** - Form state and validation
+- **op-sqlite** - Local SQLite database
+- **React Navigation 7** - Navigation
+- **FlashList** - 60fps list rendering
+- **Reanimated 3** - Gesture animations
+- **Firebase + Notifee** - Push notifications
 
-```sh
-# Using npm
-npm start
+## Prerequisites
 
-# OR using Yarn
-yarn start
+- Node.js >= 20
+- Docker & Docker Compose
+- Xcode 15+ (iOS)
+- Android Studio (Android)
+- CocoaPods
+- Java 17+ (Android)
+
+## Getting Started
+
+### 1. Clone and Install
+
+```bash
+git clone <repository-url>
+cd FieldPulse
+
+# Install dependencies
+npm install
+
+# iOS: Install CocoaPods
+cd ios && pod install && cd ..
 ```
 
-## Step 2: Build and run your app
+### 2. Environment Setup
 
-With Metro running, open a new terminal window/pane from the root of your React Native project, and use one of the following commands to build and run your Android or iOS app:
+Create `.env` file in root:
 
-### Android
-
-```sh
-# Using npm
-npm run android
-
-# OR using Yarn
-yarn android
+```env
+API_URL=http://localhost:3000/api
 ```
 
-### iOS
+Create `backend/.env` file:
 
-For iOS, remember to install CocoaPods dependencies (this only needs to be run on first clone or after updating native deps).
+```env
+DATABASE_URL=postgres://postgres:postgres@localhost:5432/fieldpulse
+JWT_SECRET=your-super-secret-jwt-key-change-in-production
+JWT_REFRESH_SECRET=your-refresh-secret-key-change-in-production
+PORT=3000
+NODE_ENV=development
 
-The first time you create a new project, run the Ruby bundler to install CocoaPods itself:
-
-```sh
-bundle install
+# Push Notifications (optional)
+PUSH_ENABLED=false
+FIREBASE_SERVICE_ACCOUNT_PATH=./firebase-service-account.json
 ```
 
-Then, and every time you update your native dependencies, run:
+### 3. Start Backend Services (Docker)
 
-```sh
-bundle exec pod install
+```bash
+cd backend
+
+# Start PostgreSQL with Docker
+docker-compose up -d
+
+# Install backend dependencies
+npm install
+
+# Run migrations
+npm run migrate
+
+# Seed test data (creates 500 jobs, 50 customers, 4 users)
+npm run seed
+
+# Start server
+npm run dev
 ```
 
-For more information, please visit [CocoaPods Getting Started guide](https://guides.cocoapods.org/using/getting-started.html).
+The backend will be available at `http://localhost:3000`.
 
-```sh
-# Using npm
+### 4. Run the App
+
+```bash
+# iOS Simulator
 npm run ios
 
-# OR using Yarn
-yarn ios
+# Android Emulator
+npm run android
+
+# For physical device, update API_URL in .env to your machine's IP
+API_URL=http://192.168.x.x:3000/api
 ```
 
-If everything is set up correctly, you should see your new app running in the Android Emulator, iOS Simulator, or your connected device.
+## Project Structure
 
-This is one way to run your app — you can also build it directly from Android Studio or Xcode.
+```
+FieldPulse/
+├── src/
+│   ├── api/              # API client and endpoints
+│   ├── components/       # Reusable UI components
+│   │   ├── checklist/    # Form fields (10 types)
+│   │   ├── common/       # Shared components (StatusBadge, Banner, etc.)
+│   │   ├── jobs/         # Job list components
+│   │   └── ui/           # Reusable UI (Button, Input, Card, Modal)
+│   ├── constants/        # App constants
+│   ├── db/               # SQLite setup & repositories
+│   ├── navigation/       # React Navigation config
+│   ├── screens/          # Screen components (folder structure)
+│   │   ├── auth/         # LoginScreen/
+│   │   ├── jobs/         # JobListScreen/, JobDetailsScreen/
+│   │   ├── checklist/    # ChecklistScreen/, PhotoCaptureScreen/, etc.
+│   │   └── settings/     # SettingsScreen/
+│   ├── services/         # Notifications, deep linking
+│   ├── store/            # Zustand stores
+│   ├── types/            # TypeScript types
+│   └── utils/            # Utilities and helpers
+├── backend/              # Express.js backend
+│   ├── src/
+│   │   ├── api/          # Routes, middleware, validators
+│   │   ├── db/           # Kysely + migrations + seeds
+│   │   ├── services/     # Business logic
+│   │   └── types/        # TypeScript types
+│   ├── docker-compose.yml
+│   └── tests/            # API tests
+└── e2e/                  # Detox E2E tests
+```
 
-## Step 3: Modify your app
+## Running Tests
 
-Now that you have successfully run the app, let's make changes!
+### Backend Tests
 
-Open `App.tsx` in your text editor of choice and make some changes. When you save, your app will automatically update and reflect these changes — this is powered by [Fast Refresh](https://reactnative.dev/docs/fast-refresh).
+```bash
+cd backend
 
-When you want to forcefully reload, for example to reset the state of your app, you can perform a full reload:
+# Run all tests
+npm test
 
-- **Android**: Press the <kbd>R</kbd> key twice or select **"Reload"** from the **Dev Menu**, accessed via <kbd>Ctrl</kbd> + <kbd>M</kbd> (Windows/Linux) or <kbd>Cmd ⌘</kbd> + <kbd>M</kbd> (macOS).
-- **iOS**: Press <kbd>R</kbd> in iOS Simulator.
+# Run with coverage
+npm run test:coverage
+```
 
-## Congratulations! :tada:
+### Mobile Unit Tests
 
-You've successfully run and modified your React Native App. :partying_face:
+```bash
+# Run Jest tests
+npm test
 
-### Now what?
+# Watch mode
+npm run test:watch
+```
 
-- If you want to add this new React Native code to an existing application, check out the [Integration guide](https://reactnative.dev/docs/integration-with-existing-apps).
-- If you're curious to learn more about React Native, check out the [docs](https://reactnative.dev/docs/getting-started).
+### E2E Tests (Detox)
 
-# Troubleshooting
+```bash
+# Build for iOS
+npm run e2e:build:ios
 
-If you're having issues getting the above steps to work, see the [Troubleshooting](https://reactnative.dev/docs/troubleshooting) page.
+# Run E2E tests
+npm run e2e:test:ios
+```
 
-# Learn More
+### TypeScript Check
 
-To learn more about React Native, take a look at the following resources:
+```bash
+# Check types
+npx tsc --noEmit
 
-- [React Native Website](https://reactnative.dev) - learn more about React Native.
-- [Getting Started](https://reactnative.dev/docs/environment-setup) - an **overview** of React Native and how setup your environment.
-- [Learn the Basics](https://reactnative.dev/docs/getting-started) - a **guided tour** of the React Native **basics**.
-- [Blog](https://reactnative.dev/blog) - read the latest official React Native **Blog** posts.
-- [`@facebook/react-native`](https://github.com/facebook/react-native) - the Open Source; GitHub **repository** for React Native.
+# Backend types
+cd backend && npx tsc --noEmit --skipLibCheck
+```
+
+### Lint
+
+```bash
+npm run lint
+```
+
+## API Endpoints
+
+### Authentication
+- `POST /api/auth/login` - Login
+- `POST /api/auth/refresh` - Refresh tokens
+- `POST /api/auth/logout` - Logout
+
+### Jobs
+- `GET /api/jobs` - List jobs (cursor-paginated, filtered by assigned user)
+- `GET /api/jobs/:id` - Job details with customer and checklist
+- `PATCH /api/jobs/:id` - Update job status/priority
+- `POST /api/jobs/:id/start` - Start job
+- `POST /api/jobs/:id/complete` - Complete job
+
+### Checklist
+- `GET /api/jobs/:id/checklist` - Get checklist responses
+- `PUT /api/jobs/:id/checklist/:fieldId` - Save single response
+- `POST /api/jobs/:id/checklist/batch` - Batch save responses
+- `POST /api/jobs/:id/checklist/submit` - Submit completed checklist
+
+### Upload
+- `POST /api/upload/request` - Get presigned URL for upload
+- `POST /api/upload/confirm` - Confirm upload complete
+
+### Push Notifications
+- `POST /api/notifications/push/subscribe` - Register FCM token
+- `POST /api/notifications/push/unsubscribe` - Unregister FCM token
+- `GET /api/notifications/push/settings` - Get push settings
+- `PUT /api/notifications/push/settings` - Update push settings
+- `GET /api/notifications/push/status` - Get FCM service status
+- `POST /api/notifications/push/test` - Send test notification
+- `POST /api/notifications/push/test-job` - Send test job notification with deep link
+
+### Sync
+- `POST /api/sync/pull` - Pull changes since timestamp
+- `POST /api/sync/push` - Push local changes
+
+## Firebase Setup (Push Notifications)
+
+1. Create a Firebase project at [Firebase Console](https://console.firebase.google.com)
+2. Add iOS and Android apps to the project
+3. Download `GoogleService-Info.plist` (iOS) and `google-services.json` (Android)
+4. Place them in `ios/` and `android/app/` respectively
+5. Go to Project Settings > Service Accounts
+6. Click "Generate new private key"
+7. Save the JSON file as `backend/firebase-service-account.json`
+8. Update `backend/.env`:
+   ```env
+   FIREBASE_SERVICE_ACCOUNT_PATH=./firebase-service-account.json
+   PUSH_ENABLED=true
+   ```
+
+### Testing Push Notifications
+
+```bash
+# Send a test notification to yourself
+curl -X POST http://localhost:3000/api/notifications/push/test \
+  -H "Authorization: Bearer YOUR_TOKEN" \
+  -H "Content-Type: application/json"
+
+# Send a test job notification (for deep link testing)
+curl -X POST http://localhost:3000/api/notifications/push/test-job \
+  -H "Authorization: Bearer YOUR_TOKEN" \
+  -H "Content-Type: application/json" \
+  -d '{"type": "job_assigned"}'
+```
+
+## Test Credentials
+
+After running `npm run seed` in the backend:
+
+| Role       | Email                      | Password    |
+|------------|----------------------------|-------------|
+| Admin      | admin@fieldpulse.com       | password123 |
+| Dispatcher | dispatcher@fieldpulse.com  | password123 |
+| Technician | tech@fieldpulse.com        | password123 |
+| Technician | tech2@fieldpulse.com       | password123 |
+
+Jobs are split between the two technician accounts (~250 each).
+
+## Performance
+
+### List Scrolling (500+ jobs)
+- Uses `AnimatedFlashList` with `drawDistance` optimization
+- `JobCard` component memoized with custom comparison
+- Date formatting memoized with `useMemo`
+- Maintains 60fps on mid-range devices
+
+### Offline Sync
+- Exponential backoff for failed syncs
+- Rate limit handling (429 responses)
+- Automatic retry on network restore
+
+## Known Limitations
+
+1. **Status Filter Tabs:** Touch responsiveness can be inconsistent on some devices after completing a job. Workaround: Pull to refresh.
+
+2. **Push Notifications:** Require Firebase setup. Disabled by default.
+
+3. **Photo Upload:** Large photos may fail on slow connections. Photos are compressed to max 1200x1200.
+
+4. **Offline Duration:** Extended offline periods (>7 days) may cause refresh token expiry.
+
+5. **Android Emulator:** Push notifications require Google Play Services.
+
+## Troubleshooting
+
+### iOS Build Issues
+
+```bash
+cd ios
+rm -rf Pods Podfile.lock build
+pod install --repo-update
+cd ..
+npm run ios
+```
+
+### Android Build Issues
+
+```bash
+cd android
+./gradlew clean
+cd ..
+npm run android
+```
+
+### Metro Bundler
+
+```bash
+npm start -- --reset-cache
+```
+
+### Database Reset (Backend)
+
+```bash
+cd backend
+docker-compose down -v
+docker-compose up -d
+npm run migrate
+npm run seed
+```
+
+## Architecture Decisions
+
+See [DECISIONS.md](./DECISIONS.md) for detailed technical decisions and rationale.
+
+## License
+
+Private - All rights reserved
