@@ -1,9 +1,16 @@
 // API Configuration
+// For physical device testing, replace 'localhost' with your machine's local IP address
+// Example: 'http://192.168.0.111:3000/api'
+// Find your IP: macOS: `ipconfig getifaddr en0` | Windows: `ipconfig` | Linux: `hostname -I`
 export const API_CONFIG = {
   BASE_URL: __DEV__ ? 'http://localhost:3000/api' : 'https://api.fieldpulse.app/api',
   TIMEOUT: 30000,
   REFRESH_THRESHOLD: 60, // seconds before expiry to refresh token
 } as const;
+
+// Uploads Base URL - derived from API BASE_URL (without /api suffix)
+// Used for loading photos and other uploaded assets from the server
+export const UPLOADS_BASE_URL = API_CONFIG.BASE_URL.replace(/\/api$/, '');
 
 // Storage Keys
 export const STORAGE_KEYS = {

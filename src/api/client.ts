@@ -2,10 +2,8 @@ import axios, { AxiosError, InternalAxiosRequestConfig } from 'axios';
 import * as Keychain from 'react-native-keychain';
 import { API_CONFIG, STORAGE_KEYS } from '../constants';
 
-const API_URL = 'http://192.168.0.111:3000/api';
-
 const apiClient = axios.create({
-  baseURL:API_URL|| API_CONFIG.BASE_URL,
+  baseURL:API_CONFIG.BASE_URL,
   timeout: API_CONFIG.TIMEOUT,
   headers: {
     'Content-Type': 'application/json',
@@ -110,7 +108,7 @@ apiClient.interceptors.response.use(
         }
 
         // Use the same base URL as apiClient
-        const baseUrl = apiClient.defaults.baseURL || API_URL;
+        const baseUrl = apiClient.defaults.baseURL || API_CONFIG.BASE_URL;
         const response = await axios.post(
           `${baseUrl}/auth/refresh`,
           { refreshToken }

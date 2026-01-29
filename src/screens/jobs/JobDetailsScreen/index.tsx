@@ -18,12 +18,10 @@ import type { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import MapView, { Marker } from 'react-native-maps';
 import { useJobsStore } from '../../../store/jobsStore';
 import StatusBadge from '../../../components/common/StatusBadge';
-import { UI, JOB_STATUS_COLORS, JOB_PRIORITY_COLORS } from '../../../constants';
+import { UI, JOB_STATUS_COLORS, JOB_PRIORITY_COLORS, UPLOADS_BASE_URL } from '../../../constants';
 import type { JobsStackParamList } from '../../../types';
 import { format } from 'date-fns';
 import { styles } from './styles';
-
-const UPLOADS_BASE_URL = 'http://192.168.0.111:3000';
 
 type RouteProps = RouteProp<JobsStackParamList, 'JobDetails'>;
 type NavigationProp = NativeStackNavigationProp<JobsStackParamList, 'JobDetails'>;
