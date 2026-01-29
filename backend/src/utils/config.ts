@@ -37,8 +37,6 @@ export const config = {
     region: optionalEnv('S3_REGION', 'us-east-1'),
   },
 
-  // Redis
-  redisUrl: optionalEnv('REDIS_URL', 'redis://localhost:6379'),
 
   // Rate limiting
   rateLimit: {
