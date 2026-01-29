@@ -51,24 +51,36 @@ cd ios && pod install && cd ..
 
 ### 2. Environment Setup
 
-Create `.env` file in root:
-
-```env
-API_URL=http://localhost:3000/api
-```
+The mobile app configuration is centralized in `src/constants/index.ts`. For **simulator/emulator** testing, the default `localhost` configuration works out of the box.
 
 Create `backend/.env` file:
 
 ```env
-DATABASE_URL=postgres://postgres:postgres@localhost:5432/fieldpulse
-JWT_SECRET=your-super-secret-jwt-key-change-in-production
-JWT_REFRESH_SECRET=your-refresh-secret-key-change-in-production
+# Server
 PORT=3000
 NODE_ENV=development
 
+# Database
+DATABASE_URL=postgresql://fieldpulse:fieldpulse@localhost:5432/fieldpulse
+
+# JWT
+JWT_SECRET=your-super-secret-jwt-key-change-in-production
+JWT_ACCESS_EXPIRY=15m
+JWT_REFRESH_EXPIRY=7d
+
+# S3/MinIO (for photo uploads)
+S3_ENDPOINT=http://localhost:9000
+S3_ACCESS_KEY=minioadmin
+S3_SECRET_KEY=minioadmin
+S3_BUCKET=fieldpulse
+S3_REGION=us-east-1
+
+# Redis
+REDIS_URL=redis://localhost:6379
+
 # Push Notifications (optional)
 PUSH_ENABLED=false
-FIREBASE_SERVICE_ACCOUNT_PATH=./firebase-service-account.json
+# FIREBASE_SERVICE_ACCOUNT_PATH=./firebase-service-account.json
 ```
 
 ### 3. Start Backend Services (Docker)
@@ -102,10 +114,40 @@ npm run ios
 
 # Android Emulator
 npm run android
-
-# For physical device, update API_URL in .env to your machine's IP
-API_URL=http://192.168.x.x:3000/api
 ```
+
+#### Physical Device Testing
+
+For testing on a physical device, you need to update the API URL to your machine's local IP address:
+
+1. **Find your local IP:**
+   ```bash
+   # macOS
+   ipconfig getifaddr en0
+
+   # Windows
+   ipconfig
+
+   # Linux
+   hostname -I
+   ```
+
+2. **Update `src/constants/index.ts`:**
+   ```typescript
+   export const API_CONFIG = {
+     BASE_URL: __DEV__ ? 'http://192.168.x.x:3000/api' : 'https://api.fieldpulse.app/api',
+     // ... rest of config
+   };
+   ```
+
+   The `UPLOADS_BASE_URL` is automatically derived from `BASE_URL`, so photo loading will also work.
+
+3. **Update `backend/.env`** (for MinIO/S3 photo uploads):
+   ```env
+   S3_ENDPOINT=http://192.168.x.x:9000
+   ```
+
+4. **Restart Metro bundler and backend server** after making changes.
 
 ## Project Structure
 
